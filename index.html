@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TVU Networks — Satellite to IP Migration</title>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ============ RESET & BASE ============ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Open Sans', Arial, sans-serif; color: #333; background: #fff; -webkit-font-smoothing: antialiased; }
+img { max-width: 100%; display: block; }
+a { text-decoration: none; }
+
+/* ============ VARIABLES ============ */
+:root {
+  --tvu-green: #2AC93A;
+  --tvu-green-dark: #22A830;
+  --tvu-black: #0B0B0B;
+  --tvu-dark: #1A1A2E;
+  --tvu-gray-dark: #333;
+  --tvu-gray: #666;
+  --tvu-gray-light: #999;
+  --tvu-bg-light: #FFFFFF;
+  --tvu-bg-dark: #0D0D1A;
+  --tvu-white: #FFFFFF;
+  --max-width: 1200px;
+  --section-pad: 60px 0;
+}
+
+/* ============ UTILITIES ============ */
+.container { max-width: var(--max-width); margin: 0 auto; padding: 0 40px; }
+.label { font-size: 12px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; color: var(--tvu-green); margin-bottom: 16px; }
+.section-title { font-size: 40px; font-weight: 800; line-height: 1.2; color: var(--tvu-black); margin-bottom: 20px; }
+.section-subtitle { font-size: 18px; line-height: 1.7; color: var(--tvu-gray); max-width: 720px; }
+.btn-primary { display: inline-block; background: var(--tvu-green); color: #fff; font-family: 'Open Sans', sans-serif; font-size: 15px; font-weight: 700; padding: 16px 36px; border-radius: 6px; transition: background 0.2s; cursor: pointer; border: none; }
+.btn-primary:hover { background: var(--tvu-green-dark); }
+.btn-outline { display: inline-block; border: 2px solid var(--tvu-green); color: var(--tvu-green); font-family: 'Open Sans', sans-serif; font-size: 15px; font-weight: 700; padding: 14px 34px; border-radius: 6px; transition: all 0.2s; background: transparent; }
+.btn-outline:hover { background: var(--tvu-green); color: #fff; }
+.green-accent { width: 48px; height: 3px; background: var(--tvu-green); border-radius: 2px; margin-bottom: 24px; }
+
+/* Section dividers */
+.section-divider {
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(90deg, transparent 0%, var(--tvu-green) 20%, var(--tvu-green) 80%, transparent 100%);
+  opacity: 0.3;
+}
+.section-divider--subtle {
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 10%, #e0e0e0 50%, transparent 90%);
+}
+
+/* Dark alternating sections */
+.section-dark {
+  background: var(--tvu-black) !important;
+}
+.section-dark .section-title { color: #fff; }
+.section-dark .section-subtitle { color: rgba(255,255,255,0.6); }
+.section-dark .label { color: var(--tvu-green); }
+
+/* ============ NAV ============ */
+.nav { background: var(--tvu-black); padding: 16px 0; position: sticky; top: 0; z-index: 100; }
+.nav .container { display: flex; align-items: center; justify-content: space-between; }
+.nav-logo { height: 32px; }
+.nav-logo svg { height: 32px; }
+.nav-links { display: flex; gap: 32px; align-items: center; }
+.nav-links a { color: #ccc; font-size: 14px; font-weight: 600; transition: color 0.2s; }
+.nav-links a:hover { color: #fff; }
+.nav-cta { background: var(--tvu-green); color: #fff !important; padding: 10px 24px; border-radius: 5px; font-size: 13px !important; }
+.nav-cta:hover { background: var(--tvu-green-dark); }
+
+/* ============ HERO ============ */
+.hero {
+  background: #0D0D1A;
+  padding: 140px 0 120px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.hero-bg {
+  position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+  z-index: 0;
+}
+.hero-bg img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  opacity: 0.50;
+}
+.hero::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.20);
+  z-index: 1;
+}
+.hero .container { position: relative; z-index: 2; }
+.hero .label { color: var(--tvu-green); margin-bottom: 24px; font-size: 13px; letter-spacing: 3px; }
+.hero h1 { font-size: 56px; font-weight: 800; color: #fff; line-height: 1.15; margin-bottom: 24px; }
+.hero h1 span { color: #fff; }
+.hero p { font-size: 20px; color: #fff; line-height: 1.6; max-width: 640px; margin: 0 auto 40px; }
+.hero .btn-row { display: flex; gap: 16px; justify-content: center; }
+
+/* ============ WHY NOW ============ */
+.why-now { padding: var(--section-pad); background: var(--tvu-bg-light); }
+.why-now-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; margin-top: 48px; }
+.why-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 32px 28px;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.05);
+  transition: transform 0.2s, box-shadow 0.2s;
+  border-top: 3px solid var(--tvu-green);
+}
+.why-card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,0.1); }
+.why-card h3 { font-size: 18px; font-weight: 700; color: var(--tvu-black); margin-bottom: 12px; line-height: 1.35; }
+.why-card p { font-size: 14px; color: var(--tvu-gray); line-height: 1.65; }
+.why-card .icon { display: none; }
+
+/* ============ HOW IT WORKS ============ */
+.how-it-works { padding: var(--section-pad); background: #fff; }
+.how-it-works .label { color: var(--tvu-green); }
+.how-it-works .section-title { color: var(--tvu-black); }
+.how-it-works .section-subtitle { color: var(--tvu-gray); }
+.phases { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; margin-top: 48px; }
+.phase {
+  padding: 36px 32px;
+  border-radius: 12px;
+  background: var(--tvu-bg-light);
+  position: relative;
+  border-left: 4px solid var(--tvu-green);
+}
+.phase-number { font-size: 13px; font-weight: 700; color: var(--tvu-green); letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 12px; }
+.phase h3 { font-size: 22px; font-weight: 700; color: var(--tvu-black); margin-bottom: 16px; }
+.phase ul { list-style: none; padding: 0; }
+.phase ul li { font-size: 14px; color: var(--tvu-gray); line-height: 1.45; padding: 3px 0 3px 20px; position: relative; }
+.phase ul li::before { content: '✓'; position: absolute; left: 0; color: var(--tvu-green); font-weight: 700; }
+
+/* Cost metric */
+.cost-metric {
+  margin-top: 64px;
+  background: var(--tvu-black);
+  border-radius: 16px;
+  padding: 56px 64px;
+  display: flex;
+  align-items: center;
+  gap: 48px;
+}
+.cost-metric .big-number { font-size: 80px; font-weight: 800; color: var(--tvu-green); line-height: 1; white-space: nowrap; }
+.cost-metric .cost-detail h3 { font-size: 24px; font-weight: 700; color: #fff; margin-bottom: 12px; }
+.cost-metric .cost-detail p { font-size: 16px; color: #fff; line-height: 1.65; }
+
+/* ============ TWO PRODUCTS ============ */
+.two-products { padding: var(--section-pad); background: var(--tvu-black); }
+.two-products .section-title { text-align: center; color: #fff; }
+.two-products .section-subtitle { text-align: center; margin: 0 auto 56px; color: #fff; }
+.two-products .label { color: var(--tvu-green); }
+.product-cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 32px; }
+.product-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 28px 28px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+  position: relative;
+  overflow: hidden;
+}
+.product-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 4px;
+  background: var(--tvu-green);
+}
+.product-card .product-image {
+  width: 100%;
+  height: 200px;
+  border-radius: 8px;
+  background: var(--tvu-black);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.product-card .product-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.product-card .product-image .img-placeholder {
+  font-size: 13px;
+  color: rgba(255,255,255,0.4);
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+.product-card .product-badge { display: inline-block; background: rgba(42,201,58,0.1); color: var(--tvu-green); font-size: 12px; font-weight: 700; padding: 5px 12px; border-radius: 20px; margin-bottom: 12px; }
+.product-card h3 { font-size: 24px; font-weight: 800; color: var(--tvu-black); margin-bottom: 4px; }
+.product-card .product-tagline { font-size: 15px; color: var(--tvu-green); font-weight: 600; margin-bottom: 12px; }
+.product-card p { font-size: 14px; color: var(--tvu-gray); line-height: 1.55; margin-bottom: 16px; }
+.product-card .features { list-style: none; padding: 0; }
+.product-card .features li { font-size: 13px; color: var(--tvu-gray-dark); padding: 5px 0 5px 24px; position: relative; border-bottom: 1px solid #f0f0f0; }
+.product-card .features li:last-child { border-bottom: none; }
+.product-card .features li::before { content: '✓'; position: absolute; left: 0; color: var(--tvu-green); font-weight: 700; }
+.product-card .price { font-size: 14px; color: var(--tvu-gray); margin-top: 12px; padding-top: 12px; border-top: 2px solid #f0f0f0; }
+.product-card .price strong { color: var(--tvu-black); font-size: 24px; }
+
+/* ============ MIGRATION TIMELINE ============ */
+.migration { padding: var(--section-pad); background: #fff; }
+.timeline { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; margin-top: 56px; position: relative; }
+.timeline::before { content: ''; position: absolute; top: 40px; left: 5%; right: 5%; height: 3px; background: linear-gradient(90deg, var(--tvu-green), rgba(42,201,58,0.2)); border-radius: 2px; }
+.timeline-step { text-align: center; position: relative; padding: 0 16px; }
+.timeline-step .step-dot {
+  width: 48px; height: 48px; border-radius: 50%;
+  background: var(--tvu-green);
+  color: #fff; font-weight: 800; font-size: 18px;
+  display: flex; align-items: center; justify-content: center;
+  margin: 16px auto 24px;
+  position: relative; z-index: 1;
+  box-shadow: 0 0 0 6px rgba(42,201,58,0.15);
+}
+.timeline-step .step-timing { font-size: 12px; font-weight: 700; color: var(--tvu-green); letter-spacing: 1px; text-transform: uppercase; }
+.timeline-step h4 { font-size: 18px; font-weight: 700; color: var(--tvu-black); margin-bottom: 10px; }
+.timeline-step p { font-size: 13px; color: var(--tvu-gray); line-height: 1.6; }
+
+/* ============ EBOOK ============ */
+.ebook {
+  padding: 32px 0 60px;
+  background: linear-gradient(135deg, var(--tvu-black) 50%, var(--tvu-green) 100%);
+  position: relative;
+  overflow: hidden;
+}
+.ebook::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.20);
+  z-index: 1;
+}
+.ebook .container { position: relative; z-index: 2; }
+.ebook-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center; }
+.ebook-left h2 { font-size: 36px; font-weight: 800; color: #fff; margin-bottom: 20px; line-height: 1.25; }
+.ebook-left p { font-size: 16px; color: #fff; line-height: 1.7; margin-bottom: 32px; }
+.ebook-cover {
+  width: 100%; max-width: 360px;
+  height: 420px;
+  background: linear-gradient(145deg, #1e1e3a, #2a2a4a);
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.1);
+  display: flex; align-items: center; justify-content: center;
+  flex-direction: column;
+  padding: 40px;
+  text-align: center;
+}
+.ebook-cover .cover-label { font-size: 11px; color: var(--tvu-green); font-weight: 700; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 16px; }
+.ebook-cover .cover-title { font-size: 22px; font-weight: 800; color: #fff; line-height: 1.3; margin-bottom: 12px; }
+.ebook-cover .cover-sub { font-size: 13px; color: #fff; }
+.ebook-cover .cover-logo { margin-top: 32px; font-size: 12px; color: var(--tvu-green); font-weight: 700; letter-spacing: 1px; }
+
+/* Form */
+.ebook-form { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 36px; }
+.ebook-form h3 { font-size: 20px; font-weight: 700; color: #fff; margin-bottom: 24px; }
+.form-group { margin-bottom: 16px; }
+.form-group label { display: block; font-size: 13px; font-weight: 600; color: #fff; margin-bottom: 6px; }
+.form-group input, .form-group select {
+  width: 100%; padding: 12px 16px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 6px;
+  color: #fff;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 14px;
+  outline: none;
+  transition: border 0.2s;
+}
+.form-group input::placeholder { color: rgba(255,255,255,0.5); }
+.form-group input:focus, .form-group select:focus { border-color: var(--tvu-green); }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.form-submit { width: 100%; margin-top: 8px; }
+
+/* ============ CASE STUDY ============ */
+.case-study { padding: var(--section-pad); background: var(--tvu-black); position: relative; }
+.case-study .section-title { color: #fff; }
+.case-study .label { color: var(--tvu-green); }
+.case-study .reuters-logo { position: absolute; top: 40px; right: 60px; height: 56px; filter: brightness(0) invert(1); }
+.case-study-main { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center; margin-top: 48px; }
+.case-article h3 { font-size: 28px; font-weight: 800; color: #fff; margin-bottom: 16px; line-height: 1.3; }
+.case-article .case-subtitle { font-size: 18px; color: #fff; line-height: 1.6; margin-bottom: 24px; }
+.case-article .case-link { color: var(--tvu-green); font-weight: 700; font-size: 15px; display: inline-flex; align-items: center; gap: 8px; }
+.case-article .case-link:hover { text-decoration: underline; }
+
+.video-placeholder {
+  width: 100%;
+  aspect-ratio: 16/9;
+  background: linear-gradient(135deg, #1A1A2E, #0D0D1A);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+.video-placeholder .play-btn {
+  width: 72px; height: 72px; border-radius: 50%;
+  background: var(--tvu-green);
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 16px;
+  box-shadow: 0 0 0 12px rgba(42,201,58,0.15);
+}
+.video-placeholder .play-btn svg { margin-left: 4px; }
+.video-placeholder .vid-caption { font-size: 13px; color: #fff; text-align: center; max-width: 320px; line-height: 1.5; }
+
+/* Customer logos */
+.customers-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 64px; }
+.customer-card {
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 28px 24px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+  display: flex;
+  flex-direction: column;
+}
+.customer-card .customer-stat { font-size: 36px; font-weight: 800; color: var(--tvu-green); margin-bottom: 4px; }
+.customer-card .customer-label { font-size: 12px; font-weight: 700; color: var(--tvu-gray-light); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
+.customer-card h4 { font-size: 16px; font-weight: 700; color: var(--tvu-black); margin-bottom: 8px; }
+.customer-card p { font-size: 13px; color: var(--tvu-gray); line-height: 1.6; }
+
+/* ============ PROVEN AT SCALE ============ */
+.proven-at-scale { padding: var(--section-pad); background: #fff; }
+
+/* ============ GET STARTED CTA ============ */
+.get-started {
+  padding: 60px 0;
+  background: var(--tvu-black);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.get-started::before {
+  content: '';
+  position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+  background: radial-gradient(ellipse at center, rgba(42,201,58,0.06) 0%, transparent 50%);
+}
+.get-started .container { position: relative; z-index: 1; }
+.get-started h2 { font-size: 44px; font-weight: 800; color: #fff; margin-bottom: 16px; }
+.get-started p { font-size: 18px; color: #fff; max-width: 560px; margin: 0 auto 40px; line-height: 1.6; }
+
+/* ============ FOOTER ============ */
+.footer { background: var(--tvu-black); padding: 40px 0; text-align: center; }
+.footer p { font-size: 13px; color: #666; }
+.footer a { color: var(--tvu-green); }
+
+/* ============ RESPONSIVE ============ */
+@media (max-width: 1024px) {
+  .why-now-cards { grid-template-columns: repeat(2, 1fr); }
+  .product-cards { grid-template-columns: 1fr; }
+  .cost-metric { flex-direction: column; text-align: center; }
+}
+@media (max-width: 768px) {
+  .hero h1 { font-size: 36px; }
+  .section-title { font-size: 30px; }
+  .why-now-cards { grid-template-columns: 1fr; }
+  .phases { grid-template-columns: 1fr; }
+  .timeline { grid-template-columns: repeat(2, 1fr); gap: 32px; }
+  .timeline::before { display: none; }
+  .ebook-grid { grid-template-columns: 1fr; }
+  .case-study-main { grid-template-columns: 1fr; }
+  .customers-grid { grid-template-columns: 1fr; }
+  .hero .btn-row { flex-direction: column; align-items: center; }
+  .cost-metric { padding: 40px 32px; }
+  .cost-metric .big-number { font-size: 56px; }
+  .nav-links { display: none; }
+}
+</style>
+</head>
+<body>
+
+
+<!-- ============ HERO ============ -->
+<section class="hero">
+  <div class="hero-bg">
+    <img src="hero-satellite.png" alt="Satellite dishes with green-tinted globe overlay">
+  </div>
+  <div class="container">
+    <p class="label">IP DISTRIBUTION</p>
+    <h1>Satellite to <span>IP</span> Migration</h1>
+    <p>Your fast track from satellite to IP. Non-disruptive, fast, reliable, and cost-effective — begin your transition in days, not months.</p>
+    <div class="btn-row">
+      <a href="#learn-more" class="btn-primary">Learn More</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ WHY NOW ============ -->
+<section class="why-now" id="learn-more">
+  <div class="container">
+    <p class="label">THE CHALLENGE</p>
+    <h2 class="section-title">Satellite to IP Transition — Why Now?</h2>
+    <p class="section-subtitle">Market forces are accelerating the move to IP. The economics, logistics, and technology all point to the same conclusion: the time to transition is now.</p>
+    <div class="why-now-cards">
+      <div class="why-card">
+        <div class="icon">📡</div>
+        <h3>C-Band 5G Displacement</h3>
+        <p>The FCC has already repurposed 280 MHz for 5G. The upper C-band inquiry is underway — remaining spectrum is at risk of further reallocation.</p>
+      </div>
+      <div class="why-card">
+        <div class="icon">💲</div>
+        <h3>Rising Transponder Costs</h3>
+        <p>The SES-Intelsat merger ($3.1B) consolidates 96% of U.S. C-band spectrum. Fewer providers means fewer options and higher prices for broadcasters.</p>
+      </div>
+      <div class="why-card">
+        <div class="icon">⏱️</div>
+        <h3>Weeks to Provision</h3>
+        <p>Adding a new satellite destination means shipping hardware, installing dishes, and waiting 2–4 weeks per site. IP provisioning takes hours.</p>
+      </div>
+      <div class="why-card">
+        <div class="icon">⚙️</div>
+        <h3>Aging Infrastructure</h3>
+        <p>IRD fleets ($1,500–$2,500/unit) need replacement. RF engineers are retiring. Manual failover takes 5–15 minutes vs. sub-second with IP.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CASE STUDY: REUTERS ============ -->
+<section class="case-study">
+  <img src="reuters-2-1.svg" alt="Reuters" class="reuters-logo">
+  <div class="container">
+    <p class="label">CUSTOMER SHOWCASE</p>
+    <h2 class="section-title">Reuters &amp; TVU Networks</h2>
+
+    <div class="case-study-main">
+      <div class="case-article">
+        <h3>Reuters Begins the Satellite-to-IP Migration: A New Foundation for Live Distribution</h3>
+        <p class="case-subtitle">Reuters is transitioning its global live news distribution infrastructure from satellite to IP using TVU Networks, establishing a new model for cost-effective, scalable, and resilient content delivery.</p>
+        <a href="https://www.tvunetworks.com/story/reuters-begins-the-satellite-to-ip-migration-a-new-foundation-for-live-news-distribution/" class="case-link">
+          Read the full story →
+        </a>
+      </div>
+      <div class="video-placeholder">
+        <div class="play-btn">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="white"><polygon points="8,5 19,12 8,19"/></svg>
+        </div>
+        <p class="vid-caption">Interview: Joseph Dalshadian, Director of Content Distribution, Reuters &amp; Johannes Heckmann, Senior Solutions Architect, TVU Networks</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============ HOW IT WORKS ============ -->
+<section class="how-it-works">
+  <div class="container">
+    <p class="label">HOW IT WORKS</p>
+    <h2 class="section-title">Start Simple. Grow Without Limits.</h2>
+    <p class="section-subtitle">Begin as a transparent satellite replacement — then unlock the full TVU ecosystem at your own pace.</p>
+
+    <div class="phases">
+      <div class="phase">
+        <p class="phase-number">Phase 1</p>
+        <h3>Satellite Pass-Through</h3>
+        <ul>
+          <li>Drop-in replacement for satellite</li>
+          <li>Same workflow, same endpoints</li>
+          <li>IP passthrough — no disruption</li>
+          <li>Majwell receiver at ~$300/endpoint</li>
+        </ul>
+      </div>
+      <div class="phase">
+        <p class="phase-number">Phase 2</p>
+        <h3>Smart Distribution</h3>
+        <ul>
+          <li>Multi-protocol support (SRT, RIST, Zixi)</li>
+          <li>Per-destination adaptive bitrate</li>
+          <li>Automated monitoring dashboards</li>
+          <li>Software-defined provisioning in hours</li>
+        </ul>
+      </div>
+      <div class="phase">
+        <p class="phase-number">Phase 3</p>
+        <h3>Full Ecosystem</h3>
+        <ul>
+          <li>Cloud-native architecture</li>
+          <li>Live production, switching, graphics</li>
+          <li>AI-powered content analysis</li>
+          <li>Global reach via 500+ PoPs</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Cost Metric -->
+    <div class="cost-metric">
+      <div class="big-number">~80%</div>
+      <div class="cost-detail">
+        <h3>Average Cost Reduction Per Channel</h3>
+        <p>Comparing 1 HD channel distributed to 100 destinations: satellite runs $350K–$590K/yr (without redundancy), while TVU IP distribution totals ~$144K/yr. With redundancy, satellite doubles to $700K–$1.18M — TVU stays at ~$288K. Savings multiply with every additional channel migrated.</p>
+      </div>
+    </div>
+
+    <!-- Seamless Migration Timeline -->
+    <h3 style="font-size: 22px; font-weight: 700; color: var(--tvu-black); margin-top: 56px; margin-bottom: 8px; text-align: center;">Seamless Migration — No Disruption</h3>
+    <p style="font-size: 15px; color: var(--tvu-gray); margin-bottom: 0; text-align: center;">Start with a pilot, prove it works, then scale at your pace.</p>
+
+    <div class="timeline">
+      <div class="timeline-step">
+        <p class="step-timing">Week 1–2</p>
+        <div class="step-dot">1</div>
+        <h4>Assess</h4>
+        <p>Audit satellite utilization. Identify pilot channels. Define success metrics.</p>
+      </div>
+      <div class="timeline-step">
+        <p class="step-timing">Week 3–6</p>
+        <div class="step-dot">2</div>
+        <h4>Pilot</h4>
+        <p>Deploy TVU on 5–10 destinations. Run side-by-side with satellite. Validate quality.</p>
+      </div>
+      <div class="timeline-step">
+        <p class="step-timing">Month 2–6</p>
+        <div class="step-dot">3</div>
+        <h4>Scale</h4>
+        <p>Migrate non-critical channels. Deploy TVU receivers. Begin decommissioning satellite.</p>
+      </div>
+      <div class="timeline-step">
+        <p class="step-timing">Month 6+</p>
+        <div class="step-dot">4</div>
+        <h4>Optimize</h4>
+        <p>Full IP migration. Cloud integration. Add ecosystem capabilities. Expand destinations.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ============ TWO PRODUCTS ============ -->
+<section class="two-products">
+  <div class="container">
+    <p class="label" style="text-align:center;">THE PLATFORM</p>
+    <h2 class="section-title">Two Products. One Platform.</h2>
+    <p class="section-subtitle">Choose the right solution for your workflow — or combine both.</p>
+
+    <div class="product-cards">
+      <!-- TVU Grid -->
+      <div class="product-card">
+        <div class="product-image">
+          <img src="TVU Grid Interface.png" alt="TVU Grid Interface">
+        </div>
+        <span class="product-badge">Broadcast-Grade</span>
+        <h3>TVU Grid</h3>
+        <p class="product-tagline">Proven Broadcast-Grade Delivery</p>
+        <p>The industry standard for reliable, low-latency IP distribution. ISSP protocol with a 10+ year track record powering the world's biggest broadcasters.</p>
+        <ul class="features">
+          <li>ISSP protocol — 10+ year broadcast track record</li>
+          <li>Per-connection FEC for zero-loss delivery</li>
+          <li>500+ global PoPs — low latency worldwide</li>
+          <li>Broadcast-grade quality (no genlock needed)</li>
+          <li>TVU receiver: ~$300/endpoint</li>
+        </ul>
+        <p class="price"><strong>$50–70</strong> /destination stream per month</p>
+      </div>
+
+      <!-- TVU MediaHub -->
+      <div class="product-card">
+        <div class="product-image">
+          <img src="TVU NEDIAHUB_2 1.png" alt="TVU MediaHub Interface">
+        </div>
+        <span class="product-badge">Protocol-Adaptive</span>
+        <h3>TVU MediaHub</h3>
+        <p class="product-tagline">Protocol-Adaptive Gateway</p>
+        <p>The anything-in, anything-out cloud gateway. Works with your existing infrastructure — SRT, RIST, Zixi, HLS, RTMP — no rip-and-replace required.</p>
+        <ul class="features">
+          <li>Anything-in / anything-out architecture</li>
+          <li>SRT, RIST, Zixi, HLS, RTMP — all supported</li>
+          <li>No rip-and-replace of existing receivers</li>
+          <li>Cloud-native, infinitely scalable</li>
+          <li>Multi-protocol ingest &amp; delivery gateway</li>
+        </ul>
+        <p class="price"><strong>$70–90</strong> /destination stream per month</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ EBOOK ============ -->
+<section class="ebook">
+  <div class="container">
+    <div class="ebook-grid">
+      <div class="ebook-left">
+        <p class="label">FREE GUIDE</p>
+        <h2>The Complete Guide to Satellite-to-IP Migration</h2>
+        <p>Learn the technical considerations, cost analysis frameworks, and deployment strategies that leading broadcasters use to successfully transition from satellite to IP distribution.</p>
+        <!-- eBook Cover Placeholder -->
+        <div class="ebook-cover">
+          <p class="cover-label">eBook</p>
+          <p class="cover-title">Satellite to IP Migration Guide</p>
+          <p class="cover-sub">Planning, deployment &amp; cost strategies for broadcasters</p>
+          <p class="cover-logo">TVU NETWORKS</p>
+        </div>
+      </div>
+      <div>
+        <div class="ebook-form">
+          <h3>Download the Guide</h3>
+          <div class="form-row">
+            <div class="form-group">
+              <label>First Name *</label>
+              <input type="text" placeholder="First name">
+            </div>
+            <div class="form-group">
+              <label>Last Name *</label>
+              <input type="text" placeholder="Last name">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Work Email *</label>
+            <input type="email" placeholder="you@company.com">
+          </div>
+          <div class="form-group">
+            <label>Company *</label>
+            <input type="text" placeholder="Your company">
+          </div>
+          <div class="form-group">
+            <label>Job Title</label>
+            <input type="text" placeholder="Your role">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Country *</label>
+              <select>
+                <option value="">Select country</option>
+                <option>United States</option>
+                <option>United Kingdom</option>
+                <option>Germany</option>
+                <option>France</option>
+                <option>Other</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Phone</label>
+              <input type="tel" placeholder="+1 (555) 000-0000">
+            </div>
+          </div>
+          <button class="btn-primary form-submit">Download eBook</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PROVEN AT SCALE ============ -->
+<section class="proven-at-scale">
+  <div class="container">
+    <p class="label">PROVEN AT SCALE — GLOBAL DEPLOYMENTS</p>
+    <h2 class="section-title">Trusted by the World's Leading Broadcasters</h2>
+    <div class="customers-grid">
+      <div class="customer-card">
+        <span class="customer-stat">200+</span>
+        <span class="customer-label">Stations</span>
+        <h4>ABC NewsOne</h4>
+        <p>Satellite-to-IP migration for all affiliate news distribution across the US. Running since 2019.</p>
+      </div>
+      <div class="customer-card">
+        <span class="customer-stat">47</span>
+        <span class="customer-label">Countries</span>
+        <h4>CNN Newsource</h4>
+        <p>International news feed distribution via TVU Grid to CNN affiliates worldwide.</p>
+      </div>
+      <div class="customer-card">
+        <span class="customer-stat">200+</span>
+        <span class="customer-label">Affiliates</span>
+        <h4>ANI (Asia)</h4>
+        <p>India's premier news agency. 7-year TVU Grid deployment across APAC at scale.</p>
+      </div>
+      <div class="customer-card">
+        <span class="customer-stat">28</span>
+        <span class="customer-label">Channels</span>
+        <h4>LatAm Content Distribution</h4>
+        <p>Premium content distribution across Latin America. Full satellite replacement by 2027.</p>
+      </div>
+      <div class="customer-card">
+        <span class="customer-stat">Global</span>
+        <span class="customer-label">Events</span>
+        <h4>Sports Rights Delivery</h4>
+        <p>Live sports content distribution to rights holders worldwide — FIFA, cricket, motorsports events.</p>
+      </div>
+      <div class="customer-card">
+        <span class="customer-stat">Live</span>
+        <span class="customer-label">2026</span>
+        <h4>European Distribution</h4>
+        <p>Major IP distribution go-live in Europe. Low-cost Grid model for large-scale delivery.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ GET STARTED CTA ============ -->
+<section class="get-started" id="get-started">
+  <div class="container">
+    <p class="label" style="color: var(--tvu-green);">READY TO MIGRATE?</p>
+    <h2>Your Satellite Replacement<br>Can Begin in Days.</h2>
+    <p>Schedule a discovery call — we'll map your satellite infrastructure and identify the fastest pilot path.</p>
+    <a href="https://www.tvunetworks.com/contact-us/" class="btn-primary" style="font-size: 17px; padding: 18px 48px;">Book a Meeting</a>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer class="footer">
+  <div class="container">
+    <p>&copy; 2026 <a href="https://www.tvunetworks.com">TVU Networks</a>. All rights reserved. | <a href="https://www.tvunetworks.com/company-privacy-notice/">Privacy Policy</a> | <a href="https://www.tvunetworks.com/company-terms-and-conditions/">Terms</a></p>
+  </div>
+</footer>
+
+</body>
+</html>
